@@ -1,0 +1,35 @@
+name: solana_wallet_kit
+description: Flutter screens and secure local services for creating and restoring self-custodial Solana wallets.
+version: 0.1.0
+repository: https://github.com/ReyAlexandr/solana_wallet_kit
+issue_tracker: https://github.com/ReyAlexandr/solana_wallet_kit/issues
+
+topics:
+  - solana
+  - wallet
+  - crypto
+  - bip39
+
+environment:
+  sdk: ^3.12.1
+  flutter: ">=3.38.0"
+
+dependencies:
+  bip39: ^1.0.6
+  file_selector: ^1.1.0
+  flutter:
+    sdk: flutter
+  flutter_secure_storage: ^10.3.1
+  solana: ^0.32.0+1
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: dev.solanawalletkit
+        pluginClass: SolanaWalletKitPlugin

@@ -1,0 +1,21 @@
+name: solana_wallet_kit_example
+description: Demonstrates how a host app integrates solana_wallet_kit.
+publish_to: none
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  solana_wallet_kit:
+    path: ..
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
