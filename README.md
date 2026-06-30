@@ -6,7 +6,7 @@ creation and restoration to an application.
 It provides ready-made, theme-aware screens while keeping the security boundary
 small: recovery phrases are generated on-device, stored in protected local
 storage, and never returned through the host application's completion callback.
-The host receives only the public `WalletAccount`.
+The host receives only the public `WalletInfo`.
 
 > This package is an early preview. Review the security model and test the
 > complete flow for your application before using it with real funds.
@@ -57,9 +57,9 @@ wallet is securely saved:
 Navigator.of(context).push(
   MaterialPageRoute(
     builder: (_) => WalletSetupScreen(
-      onWalletReady: (account) async {
-        // The callback receives public account data only.
-        await api.saveWalletAddress(account.address);
+      onWalletReady: (walletInfo) async {
+        // The callback receives public wallet info only.
+        await api.saveWalletAddress(walletInfo.address);
 
         if (!context.mounted) return;
         Navigator.of(context).pushReplacementNamed('/next');
@@ -110,7 +110,7 @@ flutter run
 
 - Recovery phrases are generated and restored locally.
 - Default storage uses `flutter_secure_storage`.
-- Completion callbacks receive only `WalletAccount`.
+- Completion callbacks receive only `WalletInfo`.
 - Recovery phrases must never be sent to a backend, logs, analytics, or crash
   reports.
 - Exported JSON backups are unencrypted and must be protected like the recovery

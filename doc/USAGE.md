@@ -12,8 +12,8 @@ Create and Restore actions:
 
 ```dart
 WalletSetupScreen(
-  onWalletReady: (account) async {
-    await savePublicAddress(account.address);
+  onWalletReady: (walletInfo) async {
+    await savePublicAddress(walletInfo.address);
     navigateAfterWalletSetup();
   },
 )
@@ -39,7 +39,7 @@ RestoreSolanaWalletScreen(
 )
 ```
 
-Both completion callbacks receive a `WalletAccount`, never the recovery phrase.
+Both completion callbacks receive a `WalletInfo`, never the recovery phrase.
 
 ### Service-level integration
 
@@ -49,7 +49,7 @@ ready-made screens:
 ```dart
 const service = WalletRegistryService();
 
-final account = await service.restoreAndSaveSolanaWallet(
+final walletInfo = await service.restoreAndSaveSolanaWallet(
   mnemonicPhrase: phraseEnteredByTheUser,
 );
 ```
@@ -70,8 +70,8 @@ The callback should perform host-owned work such as:
 - Navigating to the next screen.
 
 ```dart
-Future<void> handleWalletReady(WalletAccount account) async {
-  await api.addWalletAddress(account.address);
+Future<void> handleWalletReady(WalletInfo walletInfo) async {
+  await api.addWalletAddress(walletInfo.address);
   await refreshCurrentUser();
 }
 ```
@@ -79,14 +79,14 @@ Future<void> handleWalletReady(WalletAccount account) async {
 Make this operation idempotent. If backend registration fails, the screen keeps
 the saved wallet available and lets the user retry the host callback.
 
-Useful public account fields include:
+Useful `WalletInfo` fields include:
 
 ```dart
-account.chain;
-account.address;
-account.label;
-account.source;
-account.derivationPath;
+walletInfo.chain;
+walletInfo.address;
+walletInfo.label;
+walletInfo.source;
+walletInfo.derivationPath;
 ```
 
 Do not expect a mnemonic or private key in the callback.
@@ -270,10 +270,10 @@ files, or backend persistence.
 m/44'/501'/0'/0'
 ```
 
-Derive another public account from a phrase with:
+Derive another public wallet info object from a phrase with:
 
 ```dart
-final account = await service.deriveSolanaAccount(
+final walletInfo = await service.deriveSolanaAccount(
   mnemonicPhrase: phrase,
   accountIndex: 1,
 );

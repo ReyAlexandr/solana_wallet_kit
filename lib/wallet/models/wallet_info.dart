@@ -1,7 +1,7 @@
 //
 
-class WalletAccount {
-  const WalletAccount({
+class WalletInfo {
+  const WalletInfo({
     required this.chain,
     required this.address,
     required this.label,
@@ -19,13 +19,13 @@ class WalletAccount {
   final String source;
   final String? derivationPath;
 
-  factory WalletAccount.solana({
+  factory WalletInfo.solana({
     required String address,
     String label = 'Main Wallet',
     String source = createdInAppSource,
     String? derivationPath,
   }) {
-    return WalletAccount(
+    return WalletInfo(
       chain: solanaChain,
       address: address,
       label: label,

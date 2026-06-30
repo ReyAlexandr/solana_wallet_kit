@@ -6,7 +6,7 @@ This module creates and restores BIP39 Solana wallets locally.
   included in crash reports.
 - Screens save phrases through `WalletSecretStore` before invoking the host
   completion callback.
-- Host completion callbacks intentionally receive only `WalletAccount`.
+- Host completion callbacks intentionally receive only `WalletInfo`.
 - `SecureWalletSecretStore` rejects web builds.
 - Android host apps must disable cloud backup and device transfer.
 - `WalletSensitiveContent` obscures wallet UI while the app is inactive. It

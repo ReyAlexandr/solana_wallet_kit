@@ -2,8 +2,8 @@
 //
 // ======================================================
 
-import '../models/created_solana_wallet.dart';
-import '../models/wallet_account.dart';
+import '../models/wallet_secret.dart';
+import '../models/wallet_info.dart';
 import '../solana/solana_wallet_creation_service.dart';
 import '../storage/secure_wallet_secret_store.dart';
 import '../storage/wallet_secret_store.dart';
@@ -34,7 +34,7 @@ class WalletRegistryService {
 
   // ======================================================
 
-  Future<WalletAccount> createAndSaveSolanaWallet({
+  Future<WalletInfo> createAndSaveSolanaWallet({
     MnemonicStrength mnemonicStrength = MnemonicStrength.words12,
     SolanaDerivation derivation = SolanaDerivation.primary,
   }) async {
@@ -45,14 +45,14 @@ class WalletRegistryService {
       derivation: derivation,
     );
 
-    await _secretStore.saveCreatedSolanaWallet(wallet);
+    await _secretStore.saveWalletSecret(wallet);
 
-    return wallet.account;
+    return wallet.info;
   }
 
   // ======================================================
 
-  Future<WalletAccount> restoreAndSaveSolanaWallet({
+  Future<WalletInfo> restoreAndSaveSolanaWallet({
     required String mnemonicPhrase,
     SolanaDerivation derivation = SolanaDerivation.primary,
   }) async {
@@ -63,9 +63,9 @@ class WalletRegistryService {
       derivation: derivation,
     );
 
-    await _secretStore.saveCreatedSolanaWallet(wallet);
+    await _secretStore.saveWalletSecret(wallet);
 
-    return wallet.account;
+    return wallet.info;
   }
 
   // ======================================================
@@ -84,7 +84,7 @@ class WalletRegistryService {
 
   // ======================================================
 
-  Future<CreatedSolanaWallet> createSolanaWalletForBackup({
+  Future<WalletSecret> createWalletSecretForBackup({
     MnemonicStrength mnemonicStrength = MnemonicStrength.words12,
     SolanaDerivation derivation = SolanaDerivation.primary,
   }) {
@@ -96,7 +96,7 @@ class WalletRegistryService {
 
   // ======================================================
 
-  Future<WalletAccount> deriveSolanaAccount({
+  Future<WalletInfo> deriveSolanaAccount({
     required String mnemonicPhrase,
     required int accountIndex,
     int changeIndex = 0,
@@ -109,15 +109,15 @@ class WalletRegistryService {
       ),
     );
 
-    return wallet.account;
+    return wallet.info;
   }
 
   // ======================================================
 
-  Future<void> saveBackedUpSolanaWallet(
-    CreatedSolanaWallet wallet, //
+  Future<void> saveBackedUpWalletSecret(
+    WalletSecret wallet, //
   ) {
-    return _secretStore.saveCreatedSolanaWallet(wallet);
+    return _secretStore.saveWalletSecret(wallet);
   }
 }
 

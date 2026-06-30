@@ -14,7 +14,7 @@ void main() {
     final wallet = await creationService.restoreFromMnemonic(mnemonic);
     const store = SecureWalletSecretStore();
 
-    await store.saveCreatedSolanaWallet(wallet);
+    await store.saveWalletSecret(wallet);
     expect(await store.readSolanaMnemonic(address: wallet.address), mnemonic.split(' '));
 
     await store.deleteSolanaMnemonic(address: wallet.address);

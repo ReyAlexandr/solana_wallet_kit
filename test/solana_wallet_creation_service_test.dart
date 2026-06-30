@@ -12,7 +12,7 @@ void main() {
 
     expect(wallet.address, primaryAddress);
     expect(wallet.derivationPath, SolanaDerivation.primary.path);
-    expect(wallet.account.source, WalletAccount.importedMnemonicSource);
+    expect(wallet.info.source, WalletInfo.importedMnemonicSource);
   });
 
   test('derives different addresses for different account indexes', () async {

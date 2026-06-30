@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../models/wallet_account.dart';
+import '../models/wallet_info.dart';
 import '../models/wallet_ui_text.dart';
 import '../services/wallet_backup_gateway.dart';
 import '../services/wallet_registry_service.dart';
 import 'create_solana_wallet_screen.dart';
 import 'restore_solana_wallet_screen.dart';
 
-typedef WalletReadyCallback = FutureOr<void> Function(WalletAccount account);
+typedef WalletReadyCallback = FutureOr<void> Function(WalletInfo walletInfo);
 
 class WalletSetupScreen extends StatelessWidget {
   const WalletSetupScreen({

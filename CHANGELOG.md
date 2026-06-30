@@ -1,3 +1,8 @@
+## Unreleased
+
+- Renamed public wallet metadata and secret-bearing models to `WalletInfo` and
+  `WalletSecret`.
+
 ## 0.1.0
 
 - Initial public preview.

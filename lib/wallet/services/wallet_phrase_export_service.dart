@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:bip39/bip39.dart' as bip39;
 
-import '../models/created_solana_wallet.dart';
+import '../models/wallet_secret.dart';
 import '../models/solana_derivation.dart';
 import '../models/wallet_exception.dart';
 import '../models/wallet_phrase_file.dart';
@@ -15,10 +15,10 @@ class WalletPhraseExportService {
   static const formatId = 'solana-wallet-backup';
 
   WalletPhraseFile createFile(
-    CreatedSolanaWallet wallet, {
+    WalletSecret wallet, {
     String? fileName,
   }) {
-    final account = wallet.account;
+    final account = wallet.info;
     if (!bip39.validateMnemonic(wallet.mnemonicPhrase) ||
         !SolanaWalletValidator.isValidAddress(account.address) ||
         SolanaDerivation.tryParse(account.derivationPath) == null) {

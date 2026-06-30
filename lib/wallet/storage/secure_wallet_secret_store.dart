@@ -6,7 +6,7 @@ import 'package:bip39/bip39.dart' as bip39;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import '../models/created_solana_wallet.dart';
+import '../models/wallet_secret.dart';
 import '../models/wallet_exception.dart';
 import '../solana/solana_wallet_validator.dart';
 import 'wallet_secret_store.dart';
@@ -40,8 +40,8 @@ class SecureWalletSecretStore implements WalletSecretStore {
   // ======================================================
 
   @override
-  Future<void> saveCreatedSolanaWallet(
-    CreatedSolanaWallet wallet, //
+  Future<void> saveWalletSecret(
+    WalletSecret wallet, //
   ) {
     _ensureSupportedPlatform();
     _validateAddress(wallet.address);

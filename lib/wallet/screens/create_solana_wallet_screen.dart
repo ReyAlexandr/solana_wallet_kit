@@ -3,9 +3,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../models/created_solana_wallet.dart';
+import '../models/wallet_secret.dart';
 import '../models/mnemonic_strength.dart';
-import '../models/wallet_account.dart';
+import '../models/wallet_info.dart';
 import '../models/wallet_exception.dart';
 import '../models/wallet_phrase_file.dart';
 import '../models/wallet_ui_text.dart';
@@ -20,7 +20,7 @@ import '../widgets/wallet_sensitive_content.dart';
 
 typedef WalletCreatedCallback =
     FutureOr<void> Function(
-      WalletAccount account,
+      WalletInfo walletInfo,
     );
 typedef WalletDownloadCallback =
     FutureOr<void> Function(
@@ -73,7 +73,7 @@ class _CreateSolanaWalletScreenState extends State<CreateSolanaWalletScreen> {
   late final WalletBackupGateway _backupGateway;
   late MnemonicStrength _strength;
 
-  CreatedSolanaWallet? _wallet;
+  WalletSecret? _wallet;
   String? _errorMessage;
   bool _isGenerating = false;
   bool _isContinuing = false;
@@ -101,7 +101,7 @@ class _CreateSolanaWalletScreenState extends State<CreateSolanaWalletScreen> {
     });
 
     try {
-      final wallet = await _walletService.createSolanaWalletForBackup(
+      final wallet = await _walletService.createWalletSecretForBackup(
         mnemonicStrength: _strength,
       );
 
@@ -205,7 +205,7 @@ class _CreateSolanaWalletScreenState extends State<CreateSolanaWalletScreen> {
     });
 
     try {
-      await _walletService.saveBackedUpSolanaWallet(wallet);
+      await _walletService.saveBackedUpWalletSecret(wallet);
     } catch (error) {
       if (!mounted) return;
       setState(() {
@@ -219,7 +219,7 @@ class _CreateSolanaWalletScreenState extends State<CreateSolanaWalletScreen> {
     }
 
     try {
-      await widget.onContinue(wallet.account);
+      await widget.onContinue(wallet.info);
       if (mounted) setState(() => _wallet = null);
     } catch (_) {
       if (!mounted) return;
@@ -263,7 +263,7 @@ class _CreateSolanaWalletScreenState extends State<CreateSolanaWalletScreen> {
         false;
   }
 
-  Future<bool> _confirmRecoveryPhrase(CreatedSolanaWallet wallet) async {
+  Future<bool> _confirmRecoveryPhrase(WalletSecret wallet) async {
     final indexes = List.generate(wallet.mnemonic.length, (index) => index)
       ..shuffle(Random.secure());
     final selected = indexes.take(2).toList()..sort();

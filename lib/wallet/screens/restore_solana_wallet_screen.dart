@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../models/mnemonic_strength.dart';
 import '../models/solana_derivation.dart';
-import '../models/wallet_account.dart';
+import '../models/wallet_info.dart';
 import '../models/wallet_exception.dart';
 import '../models/wallet_phrase_file.dart';
 import '../models/wallet_ui_text.dart';
@@ -18,7 +18,7 @@ import '../widgets/wallet_sensitive_content.dart';
 
 typedef WalletRestoredCallback =
     FutureOr<void> Function(
-      WalletAccount account,
+      WalletInfo walletInfo,
     );
 typedef WalletImportCallback = Future<WalletPhraseFile?> Function();
 
@@ -189,9 +189,9 @@ class _RestoreSolanaWalletScreenState extends State<RestoreSolanaWalletScreen> {
       _errorMessage = null;
     });
 
-    late final WalletAccount account;
+    late final WalletInfo walletInfo;
     try {
-      account = await _walletService.restoreAndSaveSolanaWallet(
+      walletInfo = await _walletService.restoreAndSaveSolanaWallet(
         mnemonicPhrase: mnemonicPhrase,
         derivation: _derivation,
       );
@@ -208,7 +208,7 @@ class _RestoreSolanaWalletScreenState extends State<RestoreSolanaWalletScreen> {
     }
 
     try {
-      await widget.onContinue(account);
+      await widget.onContinue(walletInfo);
       if (mounted) _clearControllers();
     } catch (_) {
       if (!mounted) return;

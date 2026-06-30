@@ -2,7 +2,7 @@
 //
 // ======================================================
 
-import '../models/created_solana_wallet.dart';
+import '../models/wallet_secret.dart';
 
 // ======================================================
 //
@@ -11,8 +11,8 @@ import '../models/created_solana_wallet.dart';
 abstract class WalletSecretStore {
   //
 
-  Future<void> saveCreatedSolanaWallet(
-    CreatedSolanaWallet wallet, //
+  Future<void> saveWalletSecret(
+    WalletSecret wallet, //
   );
 
   Future<List<String>?> readSolanaMnemonic({

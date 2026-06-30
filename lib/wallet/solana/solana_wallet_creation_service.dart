@@ -5,8 +5,8 @@
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:solana/solana.dart';
 
-import '../models/wallet_account.dart';
-import '../models/created_solana_wallet.dart';
+import '../models/wallet_info.dart';
+import '../models/wallet_secret.dart';
 
 import '../models/mnemonic_strength.dart';
 
@@ -25,7 +25,7 @@ class SolanaWalletCreationService {
 
   // ======================================================
 
-  Future<CreatedSolanaWallet> createWallet({
+  Future<WalletSecret> createWallet({
     MnemonicStrength mnemonicStrength = MnemonicStrength.words12,
     SolanaDerivation derivation = SolanaDerivation.primary,
   }) async {
@@ -38,13 +38,13 @@ class SolanaWalletCreationService {
     return _deriveWallet(
       mnemonicPhrase: mnemonicPhrase,
       derivation: derivation,
-      source: WalletAccount.createdInAppSource,
+      source: WalletInfo.createdInAppSource,
     );
   }
 
   // ======================================================
 
-  Future<CreatedSolanaWallet> restoreFromMnemonic(
+  Future<WalletSecret> restoreFromMnemonic(
     String mnemonicPhrase, {
     SolanaDerivation derivation = SolanaDerivation.primary,
   }) async {
@@ -59,13 +59,13 @@ class SolanaWalletCreationService {
     return _deriveWallet(
       mnemonicPhrase: normalizedMnemonic,
       derivation: derivation,
-      source: WalletAccount.importedMnemonicSource,
+      source: WalletInfo.importedMnemonicSource,
     );
   }
 
   // ======================================================
 
-  Future<CreatedSolanaWallet> _deriveWallet({
+  Future<WalletSecret> _deriveWallet({
     required String mnemonicPhrase,
     required SolanaDerivation derivation,
     required String source,
@@ -76,14 +76,14 @@ class SolanaWalletCreationService {
       change: derivation.changeIndex,
     );
 
-    final account = WalletAccount.solana(
+    final info = WalletInfo.solana(
       address: keyPair.address,
       derivationPath: derivation.path,
       source: source,
     );
 
-    return CreatedSolanaWallet(
-      account: account,
+    return WalletSecret(
+      info: info,
       mnemonic: mnemonicPhrase.split(' '),
     );
   }

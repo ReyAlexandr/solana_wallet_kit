@@ -6,7 +6,7 @@ import '../models/imported_wallet_backup.dart';
 import '../models/solana_derivation.dart';
 import '../models/wallet_exception.dart';
 import '../models/wallet_phrase_file.dart';
-import '../models/wallet_account.dart';
+import '../models/wallet_info.dart';
 import '../solana/solana_wallet_creation_service.dart';
 import '../solana/solana_wallet_validator.dart';
 import 'wallet_phrase_export_service.dart';
@@ -53,7 +53,7 @@ class WalletPhraseImportService {
       throw const WalletException('Unsupported wallet backup version.');
     }
 
-    if (chain != WalletAccount.solanaChain) {
+    if (chain != WalletInfo.solanaChain) {
       throw const WalletException('Wallet backup is not for Solana.');
     }
 

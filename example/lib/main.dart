@@ -33,10 +33,10 @@ class WalletExampleHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WalletSetupScreen(
-      onWalletReady: (account) {
+      onWalletReady: (walletInfo) {
         return Navigator.of(context).push<void>(
           MaterialPageRoute(
-            builder: (_) => WalletReadyScreen(account: account),
+            builder: (_) => WalletReadyScreen(walletInfo: walletInfo),
           ),
         );
       },
@@ -45,9 +45,9 @@ class WalletExampleHome extends StatelessWidget {
 }
 
 class WalletReadyScreen extends StatelessWidget {
-  const WalletReadyScreen({super.key, required this.account});
+  const WalletReadyScreen({super.key, required this.walletInfo});
 
-  final WalletAccount account;
+  final WalletInfo walletInfo;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class WalletReadyScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Wallet ready')),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: SelectableText(account.address),
+        child: SelectableText(walletInfo.address),
       ),
     );
   }

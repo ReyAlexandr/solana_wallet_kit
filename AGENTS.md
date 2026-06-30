@@ -5,7 +5,7 @@
 `solana_wallet_kit` is a Flutter plugin for creating and restoring
 self-custodial Solana wallets. Recovery phrases stay inside the package and are
 stored with `flutter_secure_storage`; host callbacks receive only
-`WalletAccount`.
+`WalletInfo`.
 
 ## Navigation
 

@@ -1,5 +1,5 @@
-export 'models/wallet_account.dart';
-export 'models/created_solana_wallet.dart';
+export 'models/wallet_info.dart';
+export 'models/wallet_secret.dart';
 export 'models/imported_wallet_backup.dart';
 export 'models/wallet_exception.dart';
 export 'solana/solana_wallet_creation_service.dart';

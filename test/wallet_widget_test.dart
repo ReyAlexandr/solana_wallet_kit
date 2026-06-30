@@ -4,7 +4,7 @@ import 'package:solana_wallet_kit/solana_wallet_kit.dart';
 
 void main() {
   const mnemonic = 'nothing steak step patient peasant assist add coral tone harsh hint dilemma';
-  late CreatedSolanaWallet wallet;
+  late WalletSecret wallet;
 
   setUpAll(() async {
     wallet = await const SolanaWalletCreationService().restoreFromMnemonic(
@@ -122,12 +122,12 @@ void main() {
     );
   });
 
-  testWidgets('create persists before returning only the public account', (
+  testWidgets('create persists before returning only the public wallet info', (
     tester,
   ) async {
     final events = <String>[];
     final service = _FakeWalletRegistryService(wallet, events: events);
-    WalletAccount? callbackAccount;
+    WalletInfo? callbackInfo;
 
     await tester.pumpWidget(
       MaterialApp(
@@ -135,9 +135,9 @@ void main() {
           walletService: service,
           backupGateway: const _FakeBackupGateway(),
           requireBackupConfirmation: false,
-          onContinue: (account) {
+          onContinue: (walletInfo) {
             events.add('callback');
-            callbackAccount = account;
+            callbackInfo = walletInfo;
           },
         ),
       ),
@@ -151,25 +151,25 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(events, ['saved', 'callback']);
-    expect(callbackAccount, same(wallet.account));
-    expect(callbackAccount?.address, wallet.address);
+    expect(callbackInfo, same(wallet.info));
+    expect(callbackInfo?.address, wallet.address);
   });
 
-  testWidgets('restore persists before returning only the public account', (
+  testWidgets('restore persists before returning only the public wallet info', (
     tester,
   ) async {
     final events = <String>[];
     final service = _FakeWalletRegistryService(wallet, events: events);
-    WalletAccount? callbackAccount;
+    WalletInfo? callbackInfo;
 
     await tester.pumpWidget(
       MaterialApp(
         home: RestoreSolanaWalletScreen(
           walletService: service,
           backupGateway: const _FakeBackupGateway(),
-          onContinue: (account) {
+          onContinue: (walletInfo) {
             events.add('callback');
-            callbackAccount = account;
+            callbackInfo = walletInfo;
           },
         ),
       ),
@@ -188,18 +188,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(events, ['saved', 'callback']);
-    expect(callbackAccount, same(wallet.account));
+    expect(callbackInfo, same(wallet.info));
   });
 }
 
 class _FakeWalletRegistryService extends WalletRegistryService {
   _FakeWalletRegistryService(this.wallet, {this.events});
 
-  final CreatedSolanaWallet wallet;
+  final WalletSecret wallet;
   final List<String>? events;
 
   @override
-  Future<CreatedSolanaWallet> createSolanaWalletForBackup({
+  Future<WalletSecret> createWalletSecretForBackup({
     MnemonicStrength mnemonicStrength = MnemonicStrength.words12,
     SolanaDerivation derivation = SolanaDerivation.primary,
   }) async {
@@ -207,17 +207,17 @@ class _FakeWalletRegistryService extends WalletRegistryService {
   }
 
   @override
-  Future<void> saveBackedUpSolanaWallet(CreatedSolanaWallet wallet) async {
+  Future<void> saveBackedUpWalletSecret(WalletSecret wallet) async {
     events?.add('saved');
   }
 
   @override
-  Future<WalletAccount> restoreAndSaveSolanaWallet({
+  Future<WalletInfo> restoreAndSaveSolanaWallet({
     required String mnemonicPhrase,
     SolanaDerivation derivation = SolanaDerivation.primary,
   }) async {
     events?.add('saved');
-    return wallet.account;
+    return wallet.info;
   }
 }
 
