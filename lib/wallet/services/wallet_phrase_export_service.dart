@@ -2,25 +2,33 @@ import 'dart:convert';
 
 import 'package:bip39/bip39.dart' as bip39;
 
-import '../models/wallet_secret.dart';
 import '../models/solana_derivation.dart';
 import '../models/wallet_exception.dart';
+import '../models/wallet_material.dart';
 import '../models/wallet_phrase_file.dart';
 import '../solana/solana_wallet_validator.dart';
 
 class WalletPhraseExportService {
   const WalletPhraseExportService();
 
-  static const formatVersion = 1;
+  static const formatVersion = 2;
   static const formatId = 'solana-wallet-backup';
 
   WalletPhraseFile createFile(
-    WalletSecret wallet, {
+    WalletMaterial material, {
     String? fileName,
   }) {
-    final account = wallet.info;
-    if (!bip39.validateMnemonic(wallet.mnemonicPhrase) ||
+    final account = material.info;
+    final mnemonicSecret = material.mnemonicSecret;
+    final mnemonicPhrase = mnemonicSecret?.mnemonicPhrase ?? '';
+    final privateKey = material.secret.privateKeyBase58.trim();
+
+    if (mnemonicSecret == null ||
+        mnemonicSecret.rootId != account.rootId ||
+        !bip39.validateMnemonic(mnemonicPhrase) ||
         !SolanaWalletValidator.isValidAddress(account.address) ||
+        !SolanaWalletValidator.isValidAddress(account.rootId) ||
+        privateKey.isEmpty ||
         SolanaDerivation.tryParse(account.derivationPath) == null) {
       throw const WalletException('Wallet data is not valid for export.');
     }
@@ -31,8 +39,11 @@ class WalletPhraseExportService {
       'chain': account.chain,
       'encrypted': false,
       'warning': 'Anyone with this file can control this wallet.',
-      'mnemonic': wallet.mnemonicPhrase,
+      'mnemonic': mnemonicPhrase,
+      'private_key': privateKey,
+      'private_key_encoding': 'base58',
       'address': account.address,
+      'root_id': account.rootId,
       if (account.derivationPath != null) 'derivation_path': account.derivationPath,
     });
 

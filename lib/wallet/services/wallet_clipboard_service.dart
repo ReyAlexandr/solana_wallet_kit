@@ -25,6 +25,18 @@ class WalletClipboardService {
     return copyText(address);
   }
 
+  Future<void> copyPrivateKey(
+    String privateKeyBase58, {
+    Duration clearAfter = const Duration(minutes: 1),
+  }) async {
+    final privateKey = privateKeyBase58.trim();
+    await copyText(privateKey);
+
+    if (clearAfter > Duration.zero) {
+      unawaited(_clearIfUnchanged(privateKey, clearAfter));
+    }
+  }
+
   Future<String?> pastePhrase() async {
     final data = await Clipboard.getData(Clipboard.kTextPlain);
     final text = data?.text?.trim();

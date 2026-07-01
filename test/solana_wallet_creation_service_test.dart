@@ -53,7 +53,7 @@ void main() {
   test('created mnemonic collection cannot be modified', () async {
     final wallet = await service.createWallet();
 
-    expect(() => wallet.mnemonic.add('word'), throwsUnsupportedError);
+    expect(() => wallet.mnemonic!.add('word'), throwsUnsupportedError);
   });
 
   test('derivation parser accepts valid paths and rejects invalid paths', () {

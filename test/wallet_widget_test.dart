@@ -4,7 +4,7 @@ import 'package:solana_wallet_kit/solana_wallet_kit.dart';
 
 void main() {
   const mnemonic = 'nothing steak step patient peasant assist add coral tone harsh hint dilemma';
-  late WalletSecret wallet;
+  late WalletMaterial wallet;
 
   setUpAll(() async {
     wallet = await const SolanaWalletCreationService().restoreFromMnemonic(
@@ -175,10 +175,11 @@ void main() {
       ),
     );
 
-    for (var index = 0; index < wallet.mnemonic.length; index++) {
+    final mnemonic = wallet.mnemonic!;
+    for (var index = 0; index < mnemonic.length; index++) {
       await tester.enterText(
         find.byKey(ValueKey('mnemonicWordInput${index + 1}')),
-        wallet.mnemonic[index],
+        mnemonic[index],
       );
     }
 
@@ -190,16 +191,99 @@ void main() {
     expect(events, ['saved', 'callback']);
     expect(callbackInfo, same(wallet.info));
   });
+
+  testWidgets('wallet secrets screen shows address, private key, and phrase', (
+    tester,
+  ) async {
+    final service = _FakeWalletRegistryService(wallet);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: WalletSecretsScreen(
+          address: wallet.address,
+          walletService: service,
+          protectSensitiveContent: false,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Wallet secrets'), findsOneWidget);
+    expect(find.byKey(const ValueKey('walletSecretsAddress')), findsOneWidget);
+    expect(find.byKey(const ValueKey('walletSecretsPrivateKey')), findsOneWidget);
+    expect(find.text(wallet.address), findsOneWidget);
+    expect(find.text(wallet.privateKeyBase58), findsOneWidget);
+    expect(find.byKey(const ValueKey('walletSecretsMnemonic')), findsOneWidget);
+    expect(find.text(wallet.mnemonic!.first), findsOneWidget);
+  });
+
+  testWidgets('wallet secrets screen handles missing local material', (
+    tester,
+  ) async {
+    final service = _FakeWalletRegistryService(wallet, materialToRead: null);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: WalletSecretsScreen(
+          address: wallet.address,
+          walletService: service,
+          protectSensitiveContent: false,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Wallet secrets are not available on this device.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('wallet secrets screen allows a private-key-only wallet', (
+    tester,
+  ) async {
+    final privateKeyOnly = WalletMaterial(
+      info: wallet.info,
+      secret: wallet.secret,
+    );
+    final service = _FakeWalletRegistryService(wallet, materialToRead: privateKeyOnly);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: WalletSecretsScreen(
+          address: wallet.address,
+          walletService: service,
+          protectSensitiveContent: false,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text(wallet.privateKeyBase58), findsOneWidget);
+    expect(
+      find.text('Recovery phrase is not available on this device.'),
+      findsOneWidget,
+    );
+  });
 }
 
 class _FakeWalletRegistryService extends WalletRegistryService {
-  _FakeWalletRegistryService(this.wallet, {this.events});
+  _FakeWalletRegistryService(
+    this.wallet, {
+    this.events,
+    Object? materialToRead = _defaultMaterial,
+  }) : materialToRead = identical(materialToRead, _defaultMaterial)
+           ? wallet
+           : materialToRead as WalletMaterial?;
 
-  final WalletSecret wallet;
+  static const _defaultMaterial = Object();
+
+  final WalletMaterial wallet;
   final List<String>? events;
+  final WalletMaterial? materialToRead;
 
   @override
-  Future<WalletSecret> createWalletSecretForBackup({
+  Future<WalletMaterial> createWalletMaterialForBackup({
     MnemonicStrength mnemonicStrength = MnemonicStrength.words12,
     SolanaDerivation derivation = SolanaDerivation.primary,
   }) async {
@@ -207,7 +291,7 @@ class _FakeWalletRegistryService extends WalletRegistryService {
   }
 
   @override
-  Future<void> saveBackedUpWalletSecret(WalletSecret wallet) async {
+  Future<void> saveBackedUpWalletMaterial(WalletMaterial material) async {
     events?.add('saved');
   }
 
@@ -218,6 +302,13 @@ class _FakeWalletRegistryService extends WalletRegistryService {
   }) async {
     events?.add('saved');
     return wallet.info;
+  }
+
+  @override
+  Future<WalletMaterial?> readWalletMaterial({
+    required String address,
+  }) async {
+    return materialToRead;
   }
 }
 

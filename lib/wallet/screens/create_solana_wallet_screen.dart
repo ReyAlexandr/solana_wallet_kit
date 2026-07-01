@@ -3,10 +3,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../models/wallet_secret.dart';
 import '../models/mnemonic_strength.dart';
 import '../models/wallet_info.dart';
 import '../models/wallet_exception.dart';
+import '../models/wallet_material.dart';
 import '../models/wallet_phrase_file.dart';
 import '../models/wallet_ui_text.dart';
 import '../services/wallet_backup_gateway.dart';
@@ -73,7 +73,7 @@ class _CreateSolanaWalletScreenState extends State<CreateSolanaWalletScreen> {
   late final WalletBackupGateway _backupGateway;
   late MnemonicStrength _strength;
 
-  WalletSecret? _wallet;
+  WalletMaterial? _wallet;
   String? _errorMessage;
   bool _isGenerating = false;
   bool _isContinuing = false;
@@ -101,7 +101,7 @@ class _CreateSolanaWalletScreenState extends State<CreateSolanaWalletScreen> {
     });
 
     try {
-      final wallet = await _walletService.createWalletSecretForBackup(
+      final wallet = await _walletService.createWalletMaterialForBackup(
         mnemonicStrength: _strength,
       );
 
@@ -131,9 +131,14 @@ class _CreateSolanaWalletScreenState extends State<CreateSolanaWalletScreen> {
   Future<void> _copyPhrase() async {
     final wallet = _wallet;
     if (wallet == null) return;
+    final mnemonicPhrase = wallet.mnemonicPhrase;
+    if (mnemonicPhrase == null || mnemonicPhrase.isEmpty) {
+      setState(() => _errorMessage = 'Could not copy the recovery phrase.');
+      return;
+    }
 
     try {
-      await _clipboardService.copyPhrase(wallet.mnemonicPhrase);
+      await _clipboardService.copyPhrase(mnemonicPhrase);
       if (!mounted) return;
       _showMessage(widget.text.phraseCopiedMessage);
     } catch (_) {
@@ -205,7 +210,7 @@ class _CreateSolanaWalletScreenState extends State<CreateSolanaWalletScreen> {
     });
 
     try {
-      await _walletService.saveBackedUpWalletSecret(wallet);
+      await _walletService.saveBackedUpWalletMaterial(wallet);
     } catch (error) {
       if (!mounted) return;
       setState(() {
@@ -263,9 +268,11 @@ class _CreateSolanaWalletScreenState extends State<CreateSolanaWalletScreen> {
         false;
   }
 
-  Future<bool> _confirmRecoveryPhrase(WalletSecret wallet) async {
-    final indexes = List.generate(wallet.mnemonic.length, (index) => index)
-      ..shuffle(Random.secure());
+  Future<bool> _confirmRecoveryPhrase(WalletMaterial wallet) async {
+    final mnemonic = wallet.mnemonic;
+    if (mnemonic == null || mnemonic.isEmpty) return false;
+
+    final indexes = List.generate(mnemonic.length, (index) => index)..shuffle(Random.secure());
     final selected = indexes.take(2).toList()..sort();
     final controllers = [
       TextEditingController(),
@@ -327,7 +334,7 @@ class _CreateSolanaWalletScreenState extends State<CreateSolanaWalletScreen> {
                             selected.length,
                             (index) =>
                                 controllers[index].text.trim().toLowerCase() ==
-                                wallet.mnemonic[selected[index]],
+                                mnemonic[selected[index]],
                           ).every((value) => value);
 
                           if (matches) {
@@ -454,7 +461,7 @@ class _CreateSolanaWalletScreenState extends State<CreateSolanaWalletScreen> {
                     )
                   else if (wallet != null) ...[
                     MnemonicGrid(
-                      words: wallet.mnemonic,
+                      words: wallet.mnemonic ?? const [],
                       columns: widget.phraseColumns,
                     ),
                   ],

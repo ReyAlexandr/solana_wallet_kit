@@ -3,17 +3,15 @@
 import 'wallet_info.dart';
 
 class WalletSecret {
-  WalletSecret({
-    // required this.rootId,
+  const WalletSecret({
     required this.info,
-    required List<String> mnemonic,
-  }) : mnemonic = List.unmodifiable(mnemonic);
+    required this.privateKeyBase58,
+  });
 
-  // final String rootId;
   final WalletInfo info;
-  final List<String> mnemonic;
+  final String privateKeyBase58;
 
-  String get mnemonicPhrase => mnemonic.join(' ');
   String get address => info.address;
+  String get rootId => info.rootId;
   String? get derivationPath => info.derivationPath;
 }

@@ -42,6 +42,9 @@ class WalletPhraseImportService {
     final chain = data['chain'];
     final mnemonic = _normalizeMnemonic(data['mnemonic']);
     final address = data['address'];
+    final rootId = data['root_id'];
+    final privateKey = data['private_key'];
+    final privateKeyEncoding = data['private_key_encoding'];
     final derivationPath = data['derivation_path'];
     final derivation = derivationPath is String ? SolanaDerivation.tryParse(derivationPath) : null;
 
@@ -65,6 +68,11 @@ class WalletPhraseImportService {
 
     if (address is! String ||
         !SolanaWalletValidator.isValidAddress(address) ||
+        rootId is! String ||
+        !SolanaWalletValidator.isValidAddress(rootId) ||
+        privateKey is! String ||
+        privateKey.trim().isEmpty ||
+        privateKeyEncoding != 'base58' ||
         derivation == null) {
       throw const WalletException('Wallet backup metadata is invalid.');
     }
@@ -73,7 +81,9 @@ class WalletPhraseImportService {
       mnemonic,
       derivation: derivation,
     );
-    if (restored.address != address) {
+    if (restored.info.address != address ||
+        restored.info.rootId != rootId ||
+        restored.secret.privateKeyBase58 != privateKey.trim()) {
       throw const WalletException(
         'Wallet backup does not match its recovery phrase.',
       );
@@ -82,6 +92,8 @@ class WalletPhraseImportService {
     return ImportedWalletBackup(
       mnemonicPhrase: mnemonic,
       address: address,
+      rootId: rootId,
+      privateKeyBase58: privateKey.trim(),
       derivation: derivation,
     );
   }

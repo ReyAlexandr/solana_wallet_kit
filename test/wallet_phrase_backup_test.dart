@@ -19,6 +19,8 @@ void main() {
 
     expect(backup.mnemonicPhrase, mnemonic);
     expect(backup.address, wallet.address);
+    expect(backup.rootId, wallet.rootId);
+    expect(backup.privateKeyBase58, wallet.privateKeyBase58);
     expect(backup.derivation.path, wallet.derivationPath);
   });
 
@@ -30,6 +32,9 @@ void main() {
     expect(data['format'], WalletPhraseExportService.formatId);
     expect(data['encrypted'], isFalse);
     expect(data['warning'], isNotEmpty);
+    expect(data['private_key'], wallet.privateKeyBase58);
+    expect(data['private_key_encoding'], 'base58');
+    expect(data['root_id'], wallet.rootId);
   });
 
   test('import rejects a backup with a tampered address', () async {
@@ -54,6 +59,23 @@ void main() {
     final file = exportService.createFile(wallet);
     final data = jsonDecode(file.contents) as Map<String, dynamic>;
     data['derivation_path'] = "m/44'/60'/0'/0'";
+
+    await expectLater(
+      importService.readBackup(
+        WalletPhraseFile(
+          fileName: file.fileName,
+          contents: jsonEncode(data),
+        ),
+      ),
+      throwsA(isA<WalletException>()),
+    );
+  });
+
+  test('import rejects a backup with a tampered private key', () async {
+    final wallet = await creationService.restoreFromMnemonic(mnemonic);
+    final file = exportService.createFile(wallet);
+    final data = jsonDecode(file.contents) as Map<String, dynamic>;
+    data['private_key'] = 'tampered';
 
     await expectLater(
       importService.readBackup(

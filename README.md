@@ -4,9 +4,9 @@
 creation and restoration to an application.
 
 It provides ready-made, theme-aware screens while keeping the security boundary
-small: recovery phrases are generated on-device, stored in protected local
-storage, and never returned through the host application's completion callback.
-The host receives only the public `WalletInfo`.
+small: recovery phrases and private keys are generated on-device, stored in
+protected local storage, and never returned through the host application's
+completion callback. The host receives only the public `WalletInfo`.
 
 > This package is an early preview. Review the security model and test the
 > complete flow for your application before using it with real funds.
@@ -15,9 +15,12 @@ The host receives only the public `WalletInfo`.
 
 - A `WalletSetupScreen` with Create and Restore choices.
 - Standalone Create and Restore screens for custom navigation.
+- A `WalletSecretsScreen` for viewing a locally stored address, private key,
+  and recovery phrase.
 - BIP39 recovery phrases with 12, 15, 18, 21, or 24 words.
 - Solana account derivation and address validation.
-- Secure local recovery-phrase storage.
+- Secure local storage for wallet info, per-address private keys, and mnemonic
+  roots.
 - Android system-document backup export without broad storage permissions.
 - Verified JSON backup import.
 - Responsive layouts that inherit the host application's `ThemeData`.
@@ -111,10 +114,10 @@ flutter run
 - Recovery phrases are generated and restored locally.
 - Default storage uses `flutter_secure_storage`.
 - Completion callbacks receive only `WalletInfo`.
-- Recovery phrases must never be sent to a backend, logs, analytics, or crash
-  reports.
+- Recovery phrases and private keys must never be sent to a backend, logs,
+  analytics, or crash reports.
 - Exported JSON backups are unencrypted and must be protected like the recovery
-  phrase itself.
+  phrase or private key itself.
 - `protectSensitiveContent` hides wallet screens while the app is inactive. It
   is not a universal foreground screenshot blocker.
 - Web secret storage is intentionally unsupported.

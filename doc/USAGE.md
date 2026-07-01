@@ -41,6 +41,20 @@ RestoreSolanaWalletScreen(
 
 Both completion callbacks receive a `WalletInfo`, never the recovery phrase.
 
+### Wallet secrets screen
+
+Use `WalletSecretsScreen` when the host app needs to show the currently saved
+wallet address, private key, and recovery phrase again:
+
+```dart
+WalletSecretsScreen(
+  address: currentWalletAddress,
+)
+```
+
+The screen reads from package-owned secure storage by address. It is intended
+for addresses already saved through this package.
+
 ### Service-level integration
 
 Use `WalletRegistryService` when you need wallet operations without the
@@ -183,10 +197,10 @@ The default backup flow:
 - Exports on Android through the system `ACTION_CREATE_DOCUMENT` picker.
 - Imports JSON backups through `file_selector`.
 - Uses `WalletPhraseImportService` to validate imported metadata against the
-  derived Solana address.
+  derived Solana address and private key.
 
-The exported JSON contains the recovery phrase in plain text. Anyone with the
-file can control the wallet.
+The exported JSON contains the recovery phrase and private key in plain text.
+Anyone with the file can control the wallet.
 
 ### Replace both operations
 
@@ -244,12 +258,12 @@ cancels.
 ## 5. Use custom secret storage
 
 The default `SecureWalletSecretStore` uses OS-protected storage. Advanced hosts
-can implement `WalletSecretStore` and inject it through
+can implement `WalletStore` and inject it through
 `WalletRegistryService`:
 
 ```dart
 final walletService = WalletRegistryService(
-  secretStore: MyReviewedWalletSecretStore(),
+  walletStore: MyReviewedWalletStore(),
 );
 
 WalletSetupScreen(
@@ -279,9 +293,9 @@ final walletInfo = await service.deriveSolanaAccount(
 );
 ```
 
-The current secure store indexes a phrase by address. Before presenting many
-derived accounts from one phrase, introduce a reviewed root-wallet model so
-the phrase is stored once and accounts reference that root.
+The secure store indexes wallet info and private keys by address. Mnemonic
+phrases are stored once by `WalletInfo.rootId`, which is the primary derived
+Solana address for that phrase.
 
 Read or delete a stored phrase only when implementing a reviewed wallet
 operation:
@@ -304,8 +318,8 @@ Before shipping:
 4. Perform a full rebuild after adding the plugin.
 5. Test Create, Restore, export, import, cancellation, and app
    pause/resume behavior on a real device.
-6. Confirm no recovery phrase reaches logs, analytics, crash reporting, or the
-   backend.
+6. Confirm no recovery phrase or private key reaches logs, analytics, crash
+   reporting, or the backend.
 
 See the root [README](../README.md) for the exact manifest configuration.
 
@@ -314,6 +328,7 @@ See the root [README](../README.md) for the exact manifest configuration.
 - Version `0.1.0` currently supports and verifies Android only; iOS support is
   planned for a future release.
 - Web secure storage is intentionally unsupported.
-- JSON backups are not encrypted.
+- JSON backups are not encrypted and contain the recovery phrase plus private
+  key.
 - Lifecycle obscuring is not a universal screenshot blocker.
 - The package currently targets Solana only.
